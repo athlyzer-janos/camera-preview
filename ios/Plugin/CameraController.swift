@@ -423,22 +423,16 @@ extension CameraController {
         let fileUrl = path.appendingPathComponent(fileName)
         try? FileManager.default.removeItem(at: fileUrl)
         
-        if mirror {
+        
             if let connection = videoOutput?.connection(with: AVMediaType.video), connection.isVideoOrientationSupported {
-                connection.isVideoMirrored = true
+                connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIDevice.current.orientation.rawValue)!
+                if mirror {
+                    connection.isVideoMirrored = true
+                }
             } else {
                 completion(CameraControllerError.invalidOperation)
                 return
             }
-        }
-
-        // set video orientation to actual orientation of the device
-        if let connection = videoOutput?.connection(with: AVMediaType.video), connection.isVideoOrientationSupported {
-            connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIDevice.current.orientation.rawValue)!
-        } else {
-            completion(CameraControllerError.invalidOperation)
-            return
-        }
         
         videoOutput!.startRecording(to: fileUrl, recordingDelegate: self)
         completion(nil)
