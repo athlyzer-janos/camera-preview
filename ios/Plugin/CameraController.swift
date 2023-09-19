@@ -431,6 +431,14 @@ extension CameraController {
                 return
             }
         }
+
+        // set video orientation to actual orientation of the device
+        if let connection = videoOutput?.connection(with: AVMediaType.video), connection.isVideoOrientationSupported {
+            connection.videoOrientation = AVCaptureVideoOrientation(rawValue: UIDevice.current.orientation.rawValue)!
+        } else {
+            completion(CameraControllerError.invalidOperation)
+            return
+        }
         
         videoOutput!.startRecording(to: fileUrl, recordingDelegate: self)
         completion(nil)
